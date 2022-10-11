@@ -22,10 +22,10 @@ public class Map {
             //this.writeOut();
         }catch(Exception e){ wasSetup=false; return;}
     }
-    void generate(int getWidth, int getHeight){
+    public int[][] generate(int getWidth, int getHeight){
         this.setup(getWidth, getHeight);
         if(!wasSetup)
-            return;
+            return null;
         int startIndex = (int)(rand.nextInt((heightRange - 0) + 1) + 0);
         int endIndex =  (int)(rand.nextInt(( heightRange - 0) + 1) + 0);
         System.out.println("Start: 0 : "+startIndex+" , End: 9 : "+endIndex);
@@ -61,6 +61,7 @@ public class Map {
         }
         map2D[currentH][currentW] = 2;
         writeOut();
+        return map2D;
     }
 
     int[][] getMap(){
