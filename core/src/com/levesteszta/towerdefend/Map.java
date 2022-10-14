@@ -1,5 +1,6 @@
 package com.levesteszta.towerdefend;
 
+import java.lang.Thread.State;
 import java.util.*;
 
 public class Map {
@@ -8,58 +9,68 @@ public class Map {
     int widthRange = -1;
     int heightRange = -1;
     Random rand = new Random();
-    void setup(int getWidth, int getHeight){
+
+    void setup(int get_YRange, int get_XRange){
         try{
-            widthRange = (int)Math.floor(getWidth/32.0);
-            heightRange = (int)Math.floor(getHeight/32.0);
-            map2D = new int[widthRange][heightRange];
-            for(int i = 0; i < widthRange;i++)
-                for(int y = 0; y < heightRange;y++)
+            widthRange = (int)Math.floor(get_XRange/32.0);      //Hány 32x32 es kockát tudunk az X (szélesség) számegyenesre rakni 
+            heightRange = (int)Math.floor(get_YRange/32.0);     //Hány 32x32 es kockát tudunk az Y (magasság) száemgyenesre rakni 
+            
+            map2D = new int[heightRange][widthRange];
+            for(int i = 0; i < map2D.length;i++)
+                for(int y = 0; y < map2D[i].length;y++)
                     map2D[i][y] = 0;
             wasSetup = true;
-            
-            // Teszt
-            //this.writeOut();
-        }catch(Exception e){ wasSetup=false; return;}
+        }catch(Exception e){wasSetup=false; return;}
     }
-    public int[][] generate(int getWidth, int getHeight){
-        this.setup(getWidth, getHeight);
+    public int[][] generate(int get_YRange, int get_XRange){
+        setup(get_YRange, get_XRange);
         if(!wasSetup)
             return null;
-        int startIndex = (int)(rand.nextInt((heightRange - 0) + 1) + 0);
-        int endIndex =  (int)(rand.nextInt(( heightRange - 0) + 1) + 0);
-        System.out.println("Start: 0 : "+startIndex+" , End: 9 : "+endIndex);
-        int w = heightRange;                        //szélesség menyniség               --(Hányszor mehetek jobbra)
-        int h = endIndex - startIndex;              //magasság (+ lefele, - felfele)    --(Hányszor mehetek fel/le)
-        int minPath = (int)(w + Math.abs(h))-1;     //Mennyi lesz a maxút
-        int currentW = 0;
-        int currentH = startIndex;
-        int merre = -1;
-        map2D[currentH][currentW] = 2;
-        while(minPath != 0){
-            if( h != 0 && w != 0)
-                merre = (int)(rand.nextInt((1 - 0) + 1) + 0);
-            else if( Math.abs(h) > 0 && w == 0)
-                merre = 0;
-            else if( w > 0 && h == 0)
-                merre = 1;
-            
-            if(merre == 0){     //  Fell-Le
-                if(currentH != endIndex){
-                    currentH += h  > 0 ? 1 : -1;
-                    h += h > 0 ? -1 : 1;
-                    minPath--;
-                }
-            }else{              //  Jobbra
-                if(currentW != widthRange-1){
-                    currentW += 1;
-                    w--;
-                    minPath--;
+        int startIndex  = (int)(rand.nextInt(((heightRange-1) - 0) + 1) + 0);   //Hanyas sorindexből indul -> rand.nextInt((max - min) + 1) + min;
+        int endIndex    = (int)(rand.nextInt(((heightRange-1) - 0) + 1) + 0);   //Hanyas sorindexre végződik
+        System.out.println("Start: "+map2D.length+" : "+startIndex+" , End: "+map2D[0].length+" : "+endIndex);
+        
+        int w = heightRange;                        //szélesség hátra                       --(Hányszor mehetek jobbra)
+        int h = endIndex - startIndex;              //magasság (+ lefele, - felfele) hátra  --(Hányszor mehetek fel/le)
+        int minPath = (int)(w + Math.abs(h))-1;     //Mennyi lesz a minimális út -> adott út adott számú jobbra és fel/le daraból áll, ennek elosztása mindegy ilyenkor
+
+        Stack<String> utvonal = new Stack<String>();
+        map2D[startIndex][0] = 1;
+        map2D[endIndex][map2D[0].length-1] = 1;
+
+        while(minPath > 0){
+            int tmp = (rand.nextInt((1 - 0) + 1) + 0);
+            if(tmp == 0){
+                if(w > 0){
+                    tmp = (rand.nextInt((w - 0) + 1) + 0);
+                    utvonal.add(tmp+"R");
+                    w-=tmp;
+                    minPath-= tmp;
                 }
             }
-            map2D[currentH][currentW] = 2;
+            if(tmp == 1){
+                if(h != 0){
+                    if(h > 0){
+                        tmp = (rand.nextInt((h - 0) + 1) + 0);
+                        utvonal.add(tmp+"L");
+                        h-= tmp;
+                    }
+                    else{
+                        tmp = (rand.nextInt(( Math.abs(h) - 0) + 1) + 0) * -1;
+                        utvonal.add(tmp+"U");
+                        h+= tmp;
+                    }
+                    minPath -= (Math.abs(tmp));
+                }
+            }
+        };
+
+        
+
+        while(utvonal.size() != 0){
+            String tmp = utvonal.pop();
+            System.out.println(tmp);
         }
-        map2D[currentH][currentW] = 2;
         writeOut();
         return map2D;
     }

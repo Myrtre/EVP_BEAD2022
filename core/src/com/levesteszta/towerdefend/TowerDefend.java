@@ -15,8 +15,7 @@ public class TowerDefend extends ApplicationAdapter {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		room = new TileGrid(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-		room.generate();
+		new Map().generate((32*10),(32*20));
 	}	
 	
 	@Override
@@ -31,14 +30,6 @@ public class TowerDefend extends ApplicationAdapter {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		batch.begin();	
-		room.draw(batch);	
-		// Input cheker
-		if((Gdx.input.getX() > 0f && Gdx.input.getX() < 32f ) && ( Gdx.input.getY() > 0f && Gdx.input.getY() < 32f ) )
-			if(Gdx.input.isTouched())
-				System.out.println("Ez emgnyomható? :"+room.getTileDataes(Gdx.input.getX(),Gdx.input.getY()));
-
-		System.out.println(Gdx.input.getX() + " : "+ Gdx.input.getY());
-
 		batch.end();
 	}
 }
