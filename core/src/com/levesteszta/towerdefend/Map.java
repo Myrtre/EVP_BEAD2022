@@ -1,6 +1,5 @@
 package com.levesteszta.towerdefend;
 
-import java.lang.Thread.State;
 import java.util.*;
 
 public class Map {
@@ -26,50 +25,74 @@ public class Map {
         setup(get_YRange, get_XRange);
         if(!wasSetup)
             return null;
-        int startIndex  = (int)(rand.nextInt(((heightRange-1) - 0) + 1) + 0);   //Hanyas sorindexből indul -> rand.nextInt((max - min) + 1) + min;
-        int endIndex    = (int)(rand.nextInt(((heightRange-1) - 0) + 1) + 0);   //Hanyas sorindexre végződik
+        int startIndex  = (int)(rand.nextInt(((heightRange-2) - 1) + 1) + 1);   //Hanyas sorindexből indul -> rand.nextInt((max - min) + 1) + min;
+        int endIndex    = (int)(rand.nextInt(((heightRange-2) - 1) + 1) + 1);   //Hanyas sorindexre végződik
+        while(startIndex == endIndex || startIndex == endIndex-1 || startIndex == endIndex+1)
+            endIndex = (int)(rand.nextInt(((heightRange-2) - 1) + 1) + 1); 
         System.out.println("Start: "+map2D.length+" : "+startIndex+" , End: "+map2D[0].length+" : "+endIndex);
         
-        int w = heightRange;                        //szélesség hátra                       --(Hányszor mehetek jobbra)
+        int w = widthRange;                        //szélesség hátra                       --(Hányszor mehetek jobbra)
         int h = endIndex - startIndex;              //magasság (+ lefele, - felfele) hátra  --(Hányszor mehetek fel/le)
         int minPath = (int)(w + Math.abs(h))-1;     //Mennyi lesz a minimális út -> adott út adott számú jobbra és fel/le daraból áll, ennek elosztása mindegy ilyenkor
 
-        Stack<String> utvonal = new Stack<String>();
+        LinkedList<String> utvonal = new LinkedList<String>();
+
+        //Indulópont meg Végpont
         map2D[startIndex][0] = 1;
         map2D[endIndex][map2D[0].length-1] = 1;
+        w-=4;               // az első és az utolsó lépést leveszem 
+        minPath-=4;         // Az előző indokból ki kell venni az útvonal további generálásából
 
-        while(minPath > 0){
-            int tmp = (rand.nextInt((1 - 0) + 1) + 0);
-            if(tmp == 0){
-                if(w > 0){
-                    tmp = (rand.nextInt((w - 0) + 1) + 0);
-                    utvonal.add(tmp+"R");
-                    w-=tmp;
-                    minPath-= tmp;
+        while(minPath >= 0){
+            while(w != 0){
+                utvonal.add("X"+1);
+                minPath--;
+                w--;
+            }
+            while(h != 0){ 
+                if(h > 0){
+                    utvonal.add("Y"+1);
+                    h--;
+                }
+                else{
+                    utvonal.add("Y"+(-1));
+                    h++;
+                }
+                minPath--;
+            }
+        }
+        Collections.shuffle(utvonal, new Random());
+       
+        int currentX = 1; int currentY = startIndex;
+        map2D[startIndex][currentX] = 1;
+        map2D[endIndex][map2D[0].length-2] = 1;
+
+        int x = utvonal.size();
+        for(int i = 0; i < x; i++){
+            String tmp = utvonal.get(i);
+            int merre = tmp.toCharArray()[0] == 'Y' ? 1 : 0;
+            int index = Integer.parseInt((tmp.substring(1)).toString());
+
+            if(merre == 0){         // X mentén
+                while(index-- != 0){
+                    currentX++;
+                    map2D[currentY][currentX] = 1;
                 }
             }
-            if(tmp == 1){
-                if(h != 0){
-                    if(h > 0){
-                        tmp = (rand.nextInt((h - 0) + 1) + 0);
-                        utvonal.add(tmp+"L");
-                        h-= tmp;
+            else if(merre == 1){                            // Y mentén
+                while(index != 0){
+                    if(index < 0){                          // Felfele
+                        currentY--;
+                        map2D[currentY][currentX] = 1;
+                        index++;
                     }
-                    else{
-                        tmp = (rand.nextInt(( Math.abs(h) - 0) + 1) + 0) * -1;
-                        utvonal.add(tmp+"U");
-                        h+= tmp;
+                    else if( index > 0){                    // Lefele
+                        currentY++;
+                        map2D[currentY][currentX] = 1;
+                        index--;
                     }
-                    minPath -= (Math.abs(tmp));
                 }
             }
-        };
-
-        
-
-        while(utvonal.size() != 0){
-            String tmp = utvonal.pop();
-            System.out.println(tmp);
         }
         writeOut();
         return map2D;

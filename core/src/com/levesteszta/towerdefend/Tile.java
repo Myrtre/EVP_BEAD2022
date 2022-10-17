@@ -2,23 +2,23 @@ package com.levesteszta.towerdefend;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.levesteszta.towerdefend.helper.TileType;
 
 public class Tile {
-    private float x,y,width, height;
+    private float x,y,size;
     private TileType tile;
     private Texture texture;
 
-    public Tile(float x, float y, float width, float height, TileType tile){
+    public Tile(float x, float y, float size, TileType tile){
         this.setX(x);
         this.setY(y);
-        this.setWidth(width);
-        this.setHeight(height);
+        this.setSize(size);
         this.setTile(tile);
         this.setTexture(tile.TextureName);
     }
 
     public void draw(SpriteBatch sprite){
-        sprite.draw(texture, x, y, height, width);
+        sprite.draw(this.texture, x, y, size, size);
     };
 
     
@@ -40,18 +40,11 @@ public class Tile {
         this.y = y;
     }
     // width
-    public float getWidth() {
-        return width;
+    public float getSize() {
+        return size;
     }
-    public void setWidth(float width) {
-        this.width = width;
-    }
-    // height
-    public float getHeight() {
-        return height;
-    }
-    public void setHeight(float height) {
-        this.height = height;
+    public void setSize(float size) {
+        this.size = size;
     }
     // Texture
     public Texture getTexture() {

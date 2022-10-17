@@ -1,6 +1,7 @@
 package com.levesteszta.towerdefend;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.levesteszta.towerdefend.helper.TileType;
 
 public class TileGrid{
     float start_X, start_Y, end_X,end_Y;
@@ -16,15 +17,17 @@ public class TileGrid{
         this.end_Y = end_Y;
     }
 
-    public void setWindow(float width, float height){
-        this.WINDOW_HEIGHT = height;
-        this.WINDOW_WIDTH = width;
+    public void setWindow(){
+        this.WINDOW_WIDTH = end_X - start_X;    
+        this.WINDOW_HEIGHT = end_Y - start_Y;
+
+        System.out.println(WINDOW_WIDTH+" : "+WINDOW_HEIGHT);
     }
 
     public void generate(){
-        setWindow(1000, 720);
-        map_grid2 = new Tile[(int)WINDOW_HEIGHT][(int)WINDOW_WIDTH];
-		map = new Map().generate((int)WINDOW_WIDTH, (int)WINDOW_HEIGHT);
+        setWindow();
+		map = new Map().generate((int)WINDOW_HEIGHT, (int)WINDOW_WIDTH);
+        map_grid2 = new Tile[(int)map.length][(int)map[0].length];
 
         buildUp();
     }
@@ -33,24 +36,22 @@ public class TileGrid{
         for(int i = 0; i < map.length; i++){
 			for(int j = 0; j < map[0].length; j++){
 				if(map[i][j] == 0)
-					map_grid2[i][j] = new Tile(i*32, j*32, 32, 32,TileType.Fold);
-				if(map[i][j] == 2)
-					map_grid2[i][j] = new Tile(i*32, j*32, 32, 32,TileType.Ut);
+					map_grid2[i][j] = new Tile((start_X)+j*32,(start_Y)+i*32,32,TileType.Fold);
+				if(map[i][j] == 1)
+					map_grid2[i][j] = new Tile((start_X)+j*32,(start_Y)+i*32, 32,TileType.Ut);
 			}
 		};
     }
 
     public void draw(SpriteBatch batch){
-        for(int i = 0; i < map.length; i++){
-			for(int j = 0; j < map[0].length; j++){
+        for(int i = 0; i < map_grid2.length; i++){
+			for(int j = 0; j < map_grid2[i].length; j++){
 				map_grid2[i][j].draw(batch);
 			}
 		};
     }
 
     public Tile getTileDataes(float x, float y) {
-        int xx = (int)(x / 32.0);
-        int yy = (int)(x / 32.0);
-        return tiles[xx][yy];
+        return null;
     }
 }
